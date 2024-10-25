@@ -39,4 +39,11 @@ echo "Building docker-jekyll image with tag $TAG"
 ${cli_cmd}  \
     build . \
     -f Dockerfile \
+    --target jekyll
     -t $(echo "$REGISTRY/docker-jekyll:$TAG")
+
+${cli_cmd}  \
+    build . \
+    -f Dockerfile \
+    --target serve
+    -t $(echo "$REGISTRY/docker-jekyll-serve:$TAG")
