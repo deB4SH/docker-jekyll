@@ -17,14 +17,6 @@ jobs:
     - name: Set up Docker Buildx
       id: buildx
       uses: docker/setup-buildx-action@v1  
-    - name: Docker meta
-      id: meta_build
-      uses: docker/metadata-action@v3
-      with:
-        images: |
-          ghcr.io/deb4sh/docker-jekyll
-        tags: |
-          type=sha
     - name: Login to GHCR
       if: github.event_name != 'pull_request'
       uses: docker/login-action@v2
@@ -32,11 +24,37 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Docker meta
+      id: meta_build_jekyll
+      uses: docker/metadata-action@v3
+      with:
+        images: |
+          ghcr.io/deb4sh/docker-jekyll
+        tags: |
+          type=sha
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
         context: .
         file: ./Dockerfile
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta_build.outputs.tags }}
-        labels: ${{ steps.meta_build.outputs.labels }}
+        tags: ${{ steps.meta_build_jekyll.outputs.tags }}
+        labels: ${{ steps.meta_build_jekyll.outputs.labels }}
+        target: jekyll
+    - name: Docker meta
+      id: meta_build_jekyll_serve
+      uses: docker/metadata-action@v3
+      with:
+        images: |
+          ghcr.io/deb4sh/docker-jekyll-serve
+        tags: |
+          type=sha
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: ./Dockerfile
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta_build_jekyll_serve.outputs.tags }}
+        labels: ${{ steps.meta_build_jekyll_serve.outputs.labels }}
+        target: jekyll
