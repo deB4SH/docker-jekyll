@@ -5,9 +5,9 @@ RUN apt-get update \
     && mkdir /site
 # base jekyll container
 FROM base as jekyll
-COPY entrypoint.sh /usr/local/bin
 RUN gem update --system \
     && gem install jekyll \
+    && gem install bundler \
     && gem cleanup
 EXPOSE 4000
 WORKDIR /site
@@ -17,5 +17,7 @@ CMD ["--help"]
 FROM jekyll as serve
 # CLI documentation: https://jekyllrb.com/docs/usage/
 # CLI options documentation: https://jekyllrb.com/docs/configuration/options/
+COPY entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["bundle", "exec", "jekyll", "serve", "--force_polling", "-H", "0.0.0.0", "-P", "4000"]
